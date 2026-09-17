@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+backend/venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets
+.env
+*.env
+!.env.example
+firebase_credentials.json
+
+# Large Datasets
+dataset/dataset.csv
+*.csv
+
+# OS and Editor Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Testing & Execution Artifacts
+*.log
+scratch/
+.pytest_cache/

@@ -1,0 +1,57 @@
+{
+    "model_type": "PyTorch LSTM Neural Network",
+    "model_file": "backend/models/aqi_lstm_model.pth",
+    "training_file": "backend/train_model.py",
+    "dataset_file": "dataset/dataset.csv",
+    "sequence_length_hours": 24,
+    "forecast_horizon_hours": 24,
+    "feature_columns": [
+        "PM2.5",
+        "PM10",
+        "NO2",
+        "CO",
+        "SO2",
+        "O3",
+        "temperature",
+        "humidity",
+        "wind_speed",
+        "pressure",
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "AQI",
+        "pm25_roll6",
+        "pm10_roll6",
+        "aqi_roll6"
+    ],
+    "dataset_records_used": 583340,
+    "train_samples": 204157,
+    "validation_samples": 43739,
+    "test_samples": 43739,
+    "hyperparameters": {
+        "architecture": "LSTM (2 layers, hidden_dim=64, fc_32, relu, fc_1)",
+        "dropout": 0.2,
+        "optimizer": "Adam",
+        "learning_rate": 0.001,
+        "batch_size": 512,
+        "loss_function": "MSELoss",
+        "epochs_trained": 4,
+        "early_stopping": true
+    },
+    "metrics": {
+        "mae": 34.4197,
+        "rmse": 44.6938,
+        "mse": 1997.5383,
+        "r2_score": 0.7128
+    },
+    "baseline_comparison": {
+        "model_type": "Deep MLP Neural Network (Scikit-Learn)",
+        "baseline_file": "backend/models/aqi_model.joblib",
+        "mae": 34.6247,
+        "rmse": 46.2358,
+        "mse": 2137.7461,
+        "r2_score": 0.8424
+    },
+    "training_timestamp": "2026-09-16 21:37:16"
+}

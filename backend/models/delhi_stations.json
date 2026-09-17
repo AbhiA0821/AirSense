@@ -1,0 +1,245 @@
+[
+  {
+    "id": "DL001",
+    "name": "Alipur, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.7973118,
+    "lon": 77.138667,
+    "record_count": 13822,
+    "historical_mean_aqi": 218.55
+  },
+  {
+    "id": "DL002",
+    "name": "Anand Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6466157,
+    "lon": 77.3155317,
+    "record_count": 35979,
+    "historical_mean_aqi": 357.57
+  },
+  {
+    "id": "DL003",
+    "name": "Ashok Vihar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6885171,
+    "lon": 77.1739339,
+    "record_count": 20902,
+    "historical_mean_aqi": 238.36
+  },
+  {
+    "id": "DL004",
+    "name": "Aya Nagar, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.4764911,
+    "lon": 77.1329132,
+    "record_count": 22740,
+    "historical_mean_aqi": 192.07
+  },
+  {
+    "id": "DL005",
+    "name": "Bawana, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.79966,
+    "lon": 77.0328847,
+    "record_count": 17195,
+    "historical_mean_aqi": 252.78
+  },
+  {
+    "id": "DL006",
+    "name": "Burari Crossing, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.7285944,
+    "lon": 77.1993251,
+    "record_count": 16299,
+    "historical_mean_aqi": 232.27
+  },
+  {
+    "id": "DL007",
+    "name": "CRRI Mathura Road, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.5500925,
+    "lon": 77.2751557,
+    "record_count": 27851,
+    "historical_mean_aqi": 247.86
+  },
+  {
+    "id": "DL008",
+    "name": "DTU, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.7508153,
+    "lon": 77.1162765,
+    "record_count": 21335,
+    "historical_mean_aqi": 257.73
+  },
+  {
+    "id": "DL009",
+    "name": "Dr. Karni Singh Shooting Range, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5000822,
+    "lon": 77.2675147,
+    "record_count": 20674,
+    "historical_mean_aqi": 205.3
+  },
+  {
+    "id": "DL010",
+    "name": "Dwarka-Sector 8, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5656109,
+    "lon": 77.0670366,
+    "record_count": 20942,
+    "historical_mean_aqi": 261.11
+  },
+  {
+    "id": "DL012",
+    "name": "IGI Airport (T3), Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.5557595,
+    "lon": 77.0914118,
+    "record_count": 22864,
+    "historical_mean_aqi": 204.0
+  },
+  {
+    "id": "DL013",
+    "name": "IHBAS, Dilshad Garden, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.682687,
+    "lon": 77.304913,
+    "record_count": 28795,
+    "historical_mean_aqi": 226.79
+  },
+  {
+    "id": "DL014",
+    "name": "ITO, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.6281909,
+    "lon": 77.2410437,
+    "record_count": 20802,
+    "historical_mean_aqi": 230.9
+  },
+  {
+    "id": "DL015",
+    "name": "Jahangirpuri, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.7259717,
+    "lon": 77.162658,
+    "record_count": 20832,
+    "historical_mean_aqi": 261.56
+  },
+  {
+    "id": "DL016",
+    "name": "Jawaharlal Nehru Stadium, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5833771,
+    "lon": 77.2335404,
+    "record_count": 20685,
+    "historical_mean_aqi": 219.0
+  },
+  {
+    "id": "DL017",
+    "name": "Lodhi Road, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.5926365,
+    "lon": 77.2393452,
+    "record_count": 22074,
+    "historical_mean_aqi": 198.19
+  },
+  {
+    "id": "DL018",
+    "name": "Major Dhyan Chand National Stadium, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6126342,
+    "lon": 77.2373304,
+    "record_count": 20891,
+    "historical_mean_aqi": 209.5
+  },
+  {
+    "id": "DL019",
+    "name": "Mandir Marg, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.636181,
+    "lon": 77.200386,
+    "record_count": 31688,
+    "historical_mean_aqi": 221.67
+  },
+  {
+    "id": "DL020",
+    "name": "Mundka, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6824341,
+    "lon": 77.0305741,
+    "record_count": 16910,
+    "historical_mean_aqi": 270.63
+  },
+  {
+    "id": "DL021",
+    "name": "NSIT Dwarka, Delhi - CPCB",
+    "city": "Delhi",
+    "lat": 28.610533,
+    "lon": 77.035504,
+    "record_count": 35903,
+    "historical_mean_aqi": 247.57
+  },
+  {
+    "id": "DL022",
+    "name": "Najafgarh, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.609493,
+    "lon": 76.981244,
+    "record_count": 20130,
+    "historical_mean_aqi": 205.15
+  },
+  {
+    "id": "DL023",
+    "name": "Narela, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.8464766,
+    "lon": 77.0856631,
+    "record_count": 20238,
+    "historical_mean_aqi": 237.73
+  },
+  {
+    "id": "DL024",
+    "name": "Nehru Nagar, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5685108,
+    "lon": 77.2513847,
+    "record_count": 20939,
+    "historical_mean_aqi": 237.14
+  },
+  {
+    "id": "DL025",
+    "name": "North Campus, DU, Delhi - IMD",
+    "city": "Delhi",
+    "lat": 28.687979,
+    "lon": 77.209175,
+    "record_count": 21295,
+    "historical_mean_aqi": 234.75
+  },
+  {
+    "id": "DL026",
+    "name": "Okhla Phase-2, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.5374876,
+    "lon": 77.2779069,
+    "record_count": 20710,
+    "historical_mean_aqi": 218.02
+  },
+  {
+    "id": "DL027",
+    "name": "Patparganj, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.6115923,
+    "lon": 77.2905644,
+    "record_count": 20765,
+    "historical_mean_aqi": 202.92
+  },
+  {
+    "id": "DL028",
+    "name": "Punjabi Bagh, Delhi - DPCC",
+    "city": "Delhi",
+    "lat": 28.672995,
+    "lon": 77.1461239,
+    "record_count": 80,
+    "historical_mean_aqi": 338.45
+  }
+]
