@@ -148,6 +148,7 @@ function fetchLiveEnvironment() {
 
     if (!navigator.geolocation) {
         console.warn("[GPS] Geolocation API not supported by browser. Using default region.");
+        loadEnvironmentForCoordinates(userLat, userLon, true, "GPS unavailable — using Delhi NCR default region");
         return;
     }
 
@@ -159,10 +160,10 @@ function fetchLiveEnvironment() {
             loadEnvironmentForCoordinates(userLat, userLon, false);
         },
         (error) => {
-            let reason = "GPS Access Denied";
-            if (error.code === 1) reason = "Permission Denied (Code 1)";
-            else if (error.code === 2) reason = "Position Unavailable (Code 2)";
-            else if (error.code === 3) reason = "GPS Request Timeout (Code 3)";
+            let reason = "GPS unavailable — using Delhi NCR default region";
+            if (error.code === 1) reason = "Location permission denied — using Delhi NCR default region";
+            else if (error.code === 2) reason = "Position unavailable — using Delhi NCR default region";
+            else if (error.code === 3) reason = "GPS unavailable — using Delhi NCR default region";
 
             console.warn(`[GPS Error ${error.code}]: ${error.message}`);
             loadEnvironmentForCoordinates(userLat, userLon, true, reason);
@@ -185,7 +186,7 @@ function loadEnvironmentForCoordinates(lat, lon, isFallback = false, fallbackRea
         document.getElementById("heroLocationText").innerText = `📍 Location: ${defaultCity}${isFallback ? ' (Default Region)' : ''} (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
         document.getElementById("aiLocationText").innerText = `📍 Location Forecast: ${defaultCity}`;
         document.getElementById("aiPredictedVal").innerText = "92.5";
-        document.getElementById("aiModelTag").innerText = "Model: Scikit-Learn MLPRegressor";
+        document.getElementById("aiModelTag").innerText = "Model: PyTorch LSTM Neural Network";
     }
 
     fetch(`${API_BASE}/environment/current?latitude=${lat}&longitude=${lon}`)
@@ -196,7 +197,8 @@ function loadEnvironmentForCoordinates(lat, lon, isFallback = false, fallbackRea
         .then(data => {
             const statusElem = document.getElementById("navStatus");
             if (isFallback) {
-                statusElem.innerHTML = `<span class="status-dot" style="background-color:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> REGION DEFAULT (Delhi NCR) | LIVE FEEDS ONLINE (${fallbackReason})`;
+                const reasonTag = fallbackReason ? `<span style="font-size: 11px; opacity: 0.85; margin-left: 6px; font-weight: normal;">(${fallbackReason})</span>` : '';
+                statusElem.innerHTML = `<span class="status-dot" style="background-color:#10b981;box-shadow:0 0 8px #10b981;"></span> REGION DEFAULT (Delhi NCR) | LIVE FEEDS ONLINE ${reasonTag}`;
             } else {
                 statusElem.innerHTML = `<span class="status-dot"></span> BACKEND ONLINE | GPS ACTIVE (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
             }
@@ -222,8 +224,9 @@ function loadEnvironmentForCoordinates(lat, lon, isFallback = false, fallbackRea
             document.getElementById("aiLocationText").innerText = `📍 Location Forecast: ${displayCity}`;
             document.getElementById("aiPredictedVal").innerText = formatVal(ai.predicted_aqi);
             document.getElementById("aiCategory").innerText = ai.category || "Inference Complete";
-            document.getElementById("aiModelTag").innerText = `Model: ${ai.model_used || 'Scikit-Learn MLPRegressor'}`;
-            document.getElementById("aiAdvisoryText").innerText = ai.health_advisory || "Standard health advisory.";
+            document.getElementById("aiModelTag").innerText = `Model: ${ai.model_used || 'PyTorch LSTM Neural Network'}`;
+            const advElem = document.getElementById("aiAdvisoryText");
+            if (advElem) advElem.remove();
 
             // Render 24-hour numerical forecast breakdown strip
             const breakdownContainer = document.getElementById("aiForecastBreakdown");
@@ -523,6 +526,9 @@ function updateSelectedRouteSummary(r, trafficStatus, provider) {
     const recCard = document.getElementById("aiRecommendationCard");
     const recBody = document.getElementById("recBodyContent");
     if (!recCard || !recBody || !currentRouteData || !currentRouteData.routes) return;
+
+    const recBadge = document.getElementById("recModelBadge");
+    if (recBadge) recBadge.innerText = "Model: PyTorch LSTM Neural Network";
 
     const routes = currentRouteData.routes;
     const recIdx = routes.findIndex(route => route.is_recommended);

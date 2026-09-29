@@ -246,34 +246,42 @@ class AQIPredictionEngine:
         from health_advisory import get_group_advisories
         group_adv = get_group_advisories(pred_aqi)
 
-        # Honest empirical uncertainty based on documented test set residuals
+        # Honest empirical error bounds based on documented test set residuals
+        from datetime import datetime
         mae_val = float(self.metadata.get("metrics", {}).get("mae", 34.42))
         rmse_val = float(self.metadata.get("metrics", {}).get("rmse", 44.69))
-        ci_lower = max(10.0, round(pred_aqi - 1.96 * rmse_val, 1))
-        ci_upper = round(pred_aqi + 1.96 * rmse_val, 1)
+        residual_lower = max(10.0, round(pred_aqi - rmse_val, 1))
+        residual_upper = round(pred_aqi + rmse_val, 1)
 
-        uncertainty = {
-            "mae_margin": f"±{round(mae_val, 1)} AQI",
-            "confidence_interval_95": {
-                "lower": ci_lower,
-                "upper": ci_upper
+        empirical_bounds = {
+            "mae": mae_val,
+            "rmse": rmse_val,
+            "error_margin_label": f"±{round(mae_val, 1)} AQI (MAE)",
+            "test_residual_range": {
+                "lower": residual_lower,
+                "upper": residual_upper
             },
-            "methodology": "Empirical uncertainty based on test set residuals (MAE: 34.42, RMSE: 44.69 on 43,739 test samples)"
+            "methodology": "Empirical evaluation on 43,739 chronological test samples (MAE: 34.42, RMSE: 44.69 AQI). Accurately labeled error bounds; no theoretical confidence intervals claimed."
         }
 
         model_name = "PyTorch LSTM Neural Network" if self.model_kind == "torch" else "Deep MLP Neural Network (Fallback)"
 
         return {
+            "current_aqi": current_aqi,
             "predicted_aqi": pred_aqi,
             "category": category,
             "health_advisory": advisory,
             "group_advisories": group_adv,
-            "uncertainty": uncertainty,
+            "uncertainty": empirical_bounds,
+            "empirical_error_bounds": empirical_bounds,
             "model_used": model_name,
+            "model_name": model_name,
             "prediction_horizon": "+24 Hours",
+            "forecast_horizon": "+24 Hours",
             "model_metrics": self.metadata.get("metrics", {}),
             "baseline_comparison": self.metadata.get("baseline_comparison", {}),
-            "hourly_forecast": hourly_forecast
+            "hourly_forecast": hourly_forecast,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
 
 prediction_engine = AQIPredictionEngine()

@@ -46,81 +46,41 @@
     <!-- DASHBOARD CONTAINER -->
     <div class="container">
 
-        <!-- TOP HERO GRID: LIVE AQI & AI FORECAST -->
-        <div class="top-hero-grid">
-            
-            <!-- LIVE AQI HERO -->
-            <div class="glass-card live-aqi-card">
-                <div class="section-title">
-                    <span>LIVE AIR QUALITY MONITORING</span>
-                    <span class="badge-tag tag-live">LIVE DATA (WAQI API)</span>
+        <!-- 1. PRIMARY HERO: LIVE LOCATION & CURRENT AIR QUALITY MONITORING -->
+        <div class="glass-card live-aqi-card">
+            <div class="section-title">
+                <span>LIVE LOCATION & AIR QUALITY MONITORING</span>
+                <span class="badge-tag tag-live">LIVE DATA (WAQI API)</span>
+            </div>
+
+            <!-- LIVE AQI LOCATION SEARCH -->
+            <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                <input type="text" id="liveLocationSearchInput" class="form-input" placeholder="Search Delhi location (e.g. Connaught Place, Delhi Airport, India Gate)" style="flex: 1; min-width: 240px; padding: 8px 12px; font-size: 13px;">
+                <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px;" onclick="searchLiveLocation()">🔍 Search</button>
+                <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);" onclick="fetchLiveEnvironment()">📍 Use GPS</button>
+            </div>
+
+            <div class="aqi-main-display">
+                <div class="aqi-number-circle" id="heroAqiCircle" style="background: #10b981;">
+                    <span id="heroAqiVal">--</span>
+                    <small>AQI</small>
                 </div>
 
-                <!-- LIVE AQI LOCATION SEARCH -->
-                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                    <input type="text" id="liveLocationSearchInput" class="form-input" placeholder="Search Delhi location (e.g. Connaught Place, Delhi Airport, India Gate)" style="flex: 1; padding: 8px 12px; font-size: 13px;">
-                    <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px;" onclick="searchLiveLocation()">🔍 Search</button>
-                    <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);" onclick="fetchLiveEnvironment()">📍 Use GPS</button>
-                </div>
-
-                <div class="aqi-main-display">
-                    <div class="aqi-number-circle" id="heroAqiCircle" style="background: #10b981;">
-                        <span id="heroAqiVal">--</span>
-                        <small>AQI</small>
+                <div class="aqi-details">
+                    <h2 id="heroAqiCat">Detecting Location...</h2>
+                    <p id="heroAqiSub">Fetching real-time environmental metrics for selected Delhi location...</p>
+                    <div class="location-info">
+                        <span>📍</span> <span id="heroLocationText">Acquiring GPS coordinates...</span>
                     </div>
-
-                    <div class="aqi-details">
-                        <h2 id="heroAqiCat">Detecting Location...</h2>
-                        <p id="heroAqiSub">Fetching real-time environmental metrics for selected Delhi location...</p>
-                        <div class="location-info">
-                            <span>📍</span> <span id="heroLocationText">Acquiring GPS coordinates...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
-                    Last Updated: <span id="lastUpdatedTime">--:--:--</span>
                 </div>
             </div>
 
-            <!-- AI FORECAST CARD -->
-            <div class="glass-card ai-forecast-card">
-                <div class="section-title">
-                    <span>AI AQI FORECAST ENGINE</span>
-                    <span class="badge-tag tag-ai">AI FORECAST (+24H)</span>
-                </div>
-
-                <div class="location-info" style="color: #c084fc; font-weight: 600; font-size: 13px; margin-bottom: 12px;">
-                    <span>📍</span> <span id="aiLocationText">Detecting Location...</span>
-                </div>
-
-                <div class="ai-metric-display">
-                    <div class="ai-val-box">
-                        <div class="val" id="aiPredictedVal">--</div>
-                        <div class="label">Predicted AQI</div>
-                    </div>
-                    <div>
-                        <div style="font-weight: 700; color: #e2e8f0; font-size: 16px;" id="aiCategory">Scikit-Learn MLPRegressor Inference</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="aiModelTag">Model: Scikit-Learn MLPRegressor</div>
-                    </div>
-                </div>
-
-                <!-- 24-HOUR FORECAST NUMERICAL STRIP -->
-                <div style="margin-top: 10px; padding: 8px 10px; background: rgba(192, 132, 252, 0.08); border: 1px solid rgba(192, 132, 252, 0.2); border-radius: 8px;">
-                    <div style="font-size: 11px; font-weight: 600; color: #c084fc; text-transform: uppercase; margin-bottom: 4px;">24-Hour Hourly Forecast Breakdown (+1h to +24h)</div>
-                    <div id="aiForecastBreakdown" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; font-size: 11px; font-weight: 600; color: #f1f5f9;">
-                        <!-- Hourly forecast badges populated by JS -->
-                    </div>
-                </div>
-
-                <div class="advisory-box" id="aiAdvisoryText" style="margin-top: 8px;">
-                    Executing Scikit-Learn MLPRegressor time-series inference on 24-hour pollutant and weather sequence...
-                </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
+                Last Updated: <span id="lastUpdatedTime">--:--:--</span>
             </div>
-
         </div>
 
-        <!-- ENVIRONMENTAL METRICS GRID -->
+        <!-- 2. CURRENT WEATHER & POLLUTANTS (ENVIRONMENTAL & METEOROLOGICAL PARAMETERS) -->
         <div class="glass-card">
             <div class="section-title">
                 <span>ENVIRONMENTAL & METEOROLOGICAL PARAMETERS</span>
@@ -138,6 +98,37 @@
                 <div class="metric-tile"><div class="icon">🏭</div><div class="label">SO₂</div><div class="val" id="mSo2">--</div></div>
                 <div class="metric-tile"><div class="icon">🚗</div><div class="label">CO</div><div class="val" id="mCo">--</div></div>
                 <div class="metric-tile"><div class="icon">☀️</div><div class="label">O₃</div><div class="val" id="mO3">--</div></div>
+            </div>
+        </div>
+
+        <!-- 3. AI AQI FORECAST ENGINE (NORMAL INLINE SECTION) -->
+        <div class="glass-card ai-forecast-card">
+            <div class="section-title">
+                <span>AI AQI FORECAST ENGINE</span>
+                <span class="badge-tag tag-ai">AI FORECAST (+24H)</span>
+            </div>
+
+            <div class="location-info" style="color: #c084fc; font-weight: 600; font-size: 13px; margin-bottom: 12px;">
+                <span>📍</span> <span id="aiLocationText">Detecting Location...</span>
+            </div>
+
+            <div class="ai-metric-display">
+                <div class="ai-val-box">
+                    <div class="val" id="aiPredictedVal">--</div>
+                    <div class="label">Predicted AQI</div>
+                </div>
+                <div>
+                    <div style="font-weight: 700; color: #e2e8f0; font-size: 16px;" id="aiCategory">PyTorch LSTM Neural Network Inference</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="aiModelTag">Model: PyTorch LSTM Neural Network</div>
+                </div>
+            </div>
+
+            <!-- 24-HOUR FORECAST NUMERICAL STRIP -->
+            <div style="margin-top: 10px; padding: 10px 12px; background: rgba(192, 132, 252, 0.08); border: 1px solid rgba(192, 132, 252, 0.2); border-radius: 8px; max-width: 100%; box-sizing: border-box; overflow: hidden;">
+                <div style="font-size: 11px; font-weight: 600; color: #c084fc; text-transform: uppercase; margin-bottom: 6px;">24-Hour Hourly Forecast Breakdown (+1h to +24h)</div>
+                <div id="aiForecastBreakdown" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; font-size: 11px; font-weight: 600; color: #f1f5f9; width: 100%; max-width: 100%; box-sizing: border-box;">
+                    <!-- Hourly forecast badges populated by JS -->
+                </div>
             </div>
         </div>
 
@@ -308,7 +299,7 @@
                 <div id="aiRecommendationCard" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 16px; margin-top: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <span style="font-weight: 700; font-size: 14px; color: var(--accent-emerald);">🌿 AI TRAVEL RECOMMENDATION</span>
-                        <span style="font-size: 11px; color: var(--text-secondary);" id="recModelBadge">Model: Scikit-Learn MLPRegressor</span>
+                        <span style="font-size: 11px; color: var(--text-secondary);" id="recModelBadge">Model: PyTorch LSTM Neural Network</span>
                     </div>
                     <div id="recBodyContent" style="font-size: 13px; color: #e2e8f0; line-height: 1.6;">
                         Select origin and destination above and click <b>ANALYZE JOURNEY & EXPOSURE</b> to generate pollution-aware route recommendations.
@@ -328,7 +319,7 @@
             <span class="source-tag">Live Weather: Open-Meteo API</span>
             <span class="source-tag">Geocoding: OpenStreetMap Nominatim</span>
             <span class="source-tag">Road Routing: OSRM Driving Engine</span>
-            <span class="source-tag">AI Model: Deep MLP Neural Network (Scikit-Learn)</span>
+            <span class="source-tag">AI Model: PyTorch LSTM Neural Network</span>
         </div>
     </footer>
 

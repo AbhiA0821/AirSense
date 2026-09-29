@@ -28,8 +28,13 @@ dataset/dataset.csv
 Thumbs.db
 .vscode/
 .idea/
+local.properties
+.gradle/
 
 # Testing & Execution Artifacts
 *.log
+*.pid
+*.hprof
+runtime/
 scratch/
 .pytest_cache/

@@ -110,8 +110,40 @@ class OSRMRoutingEngine:
         parsed_routes[lowest_idx]["recommendation_tag"] = "✓ RECOMMENDED - LOWEST EXPOSURE"
 
         rec_route = parsed_routes[lowest_idx]
-        reason_msg = f"Recommended because Route {lowest_idx + 1} offers the lowest estimated pollution exposure (Estimated AQI: {rec_route['average_aqi']}) among available options."
+        reason_msg = (
+            f"Recommended because {rec_route['name']} offers the lowest estimated pollution exposure "
+            f"(Average AQI: {rec_route['average_aqi']}, Estimated PM2.5 Dose: {rec_route['estimated_inhaled_dose']}) "
+            f"among available road corridors."
+        )
         rec_route["exposure_analysis"]["recommendation_reason"] = reason_msg
+
+        # Construct structured multi-route comparison
+        comparison_list = []
+        for idx, r in enumerate(parsed_routes):
+            comparison_list.append({
+                "route_index": idx + 1,
+                "name": r["name"],
+                "distance_km": r["distance_km"],
+                "duration_minutes": r["duration_minutes"],
+                "average_aqi": r["average_aqi"],
+                "ai_predicted_aqi": r["ai_predicted_aqi"],
+                "pm25_exposure_dose": r["estimated_inhaled_dose"],
+                "exposure_level": r["exposure_level"],
+                "is_recommended": (idx == lowest_idx)
+            })
+
+        smart_rec = {
+            "recommended_route": rec_route["name"],
+            "environmental_exposure": "Lower",
+            "distance_km": rec_route["distance_km"],
+            "duration_minutes": rec_route["duration_minutes"],
+            "average_aqi": rec_route["average_aqi"],
+            "ai_predicted_aqi": rec_route["ai_predicted_aqi"],
+            "pm25_exposure": rec_route["estimated_inhaled_dose"],
+            "exposure_level": rec_route["exposure_level"],
+            "selection_rationale": reason_msg,
+            "traffic_limitation": "Live vehicular traffic data is unavailable from OSRM; travel duration reflects standard road speed profiles."
+        }
 
         print(f"[OSRMRoutingEngine] Selection Complete: Recommended Route {lowest_idx + 1} ({rec_route['name']})\n")
 
@@ -124,11 +156,15 @@ class OSRMRoutingEngine:
             "routing_provider": f"Open Source Routing Machine ({route_availability_note})",
             "total_routes_found": len(parsed_routes),
             "recommended_route_index": lowest_idx + 1,
+            "recommended_route_name": rec_route["name"],
+            "smart_recommendation": smart_rec,
+            "route_comparison": comparison_list,
             "routes": parsed_routes,
             "distance_km": rec_route["distance_km"],
             "duration_minutes": rec_route["duration_minutes"],
             "polyline": rec_route["polyline"],
             "traffic_status": "Live traffic unavailable (OSRM)",
+            "traffic_limitation": "Live vehicular traffic data is unavailable from OSRM; travel duration reflects standard road speed profiles.",
             "traffic_delay_minutes": 0,
             "origin": {"lat": origin_lat, "lon": origin_lon},
             "destination": {"lat": dest_lat, "lon": dest_lon},

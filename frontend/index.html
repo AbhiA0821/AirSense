@@ -208,15 +208,10 @@
 
         /* HERO ENVIRONMENT & AI GRID */
         .top-hero-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 24px;
-        }
-
-        @media (max-width: 992px) {
-            .top-hero-grid {
-                grid-template-columns: 1fr;
-            }
+            width: 100%;
         }
 
         /* LIVE AQI HERO */
@@ -556,72 +551,82 @@
     <!-- DASHBOARD CONTAINER -->
     <div class="container">
 
-        <!-- TOP HERO GRID: LIVE AQI & AI FORECAST -->
-        <div class="top-hero-grid">
-            
-            <!-- LIVE AQI HERO -->
-            <div class="glass-card live-aqi-card">
-                <div class="section-title">
-                    <span>LIVE AIR QUALITY MONITORING</span>
-                    <span class="badge-tag tag-live">LIVE DATA (WAQI API)</span>
+        <!-- 1. PRIMARY HERO: LIVE LOCATION & CURRENT AIR QUALITY MONITORING -->
+        <div class="glass-card live-aqi-card">
+            <div class="section-title">
+                <span>LIVE LOCATION & AIR QUALITY MONITORING</span>
+                <span class="badge-tag tag-live">LIVE DATA (WAQI API)</span>
+            </div>
+
+            <!-- LIVE AQI LOCATION SEARCH -->
+            <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+                <input type="text" id="liveLocationSearchInput" class="form-input" placeholder="Search Delhi location (e.g. Connaught Place, Delhi Airport, India Gate)" style="flex: 1; min-width: 240px; padding: 8px 12px; font-size: 13px;">
+                <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px;" onclick="searchLiveLocation()">🔍 Search</button>
+                <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);" onclick="fetchLiveEnvironment()">📍 Use GPS</button>
+            </div>
+
+            <div class="aqi-main-display">
+                <div class="aqi-number-circle" id="heroAqiCircle" style="background: #10b981;">
+                    <span id="heroAqiVal">--</span>
+                    <small>AQI</small>
                 </div>
 
-                <!-- LIVE AQI LOCATION SEARCH -->
-                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                    <input type="text" id="liveLocationSearchInput" class="form-input" placeholder="Search city for Live AQI (e.g. Pune, Delhi, Mumbai)" style="flex: 1; padding: 8px 12px; font-size: 13px;">
-                    <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px;" onclick="searchLiveLocation()">🔍 Search</button>
-                    <button class="btn-refresh" style="padding: 8px 14px; font-size: 13px; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4);" onclick="fetchLiveEnvironment()">📍 Use GPS</button>
-                </div>
-
-                <div class="aqi-main-display">
-                    <div class="aqi-number-circle" id="heroAqiCircle" style="background: #10b981;">
-                        <span id="heroAqiVal">--</span>
-                        <small>AQI</small>
+                <div class="aqi-details">
+                    <h2 id="heroAqiCat">Detecting Location...</h2>
+                    <p id="heroAqiSub">Fetching real-time environmental metrics for selected location...</p>
+                    <div class="location-info">
+                        <span>📍</span> <span id="heroLocationText">Acquiring GPS coordinates...</span>
                     </div>
-
-                    <div class="aqi-details">
-                        <h2 id="heroAqiCat">Detecting Location...</h2>
-                        <p id="heroAqiSub">Fetching real-time environmental metrics for selected location...</p>
-                        <div class="location-info">
-                            <span>📍</span> <span id="heroLocationText">Acquiring GPS coordinates...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
-                    Last Updated: <span id="lastUpdatedTime">--:--:--</span>
                 </div>
             </div>
 
-            <!-- AI FORECAST CARD -->
-            <div class="glass-card ai-forecast-card">
-                <div class="section-title">
-                    <span>AI AQI FORECAST ENGINE</span>
-                    <span class="badge-tag tag-ai">AI FORECAST (+24H)</span>
-                </div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 10px;">
+                Last Updated: <span id="lastUpdatedTime">--:--:--</span>
+            </div>
+        </div>
 
-                <div class="location-info" style="color: #c084fc; font-weight: 600; font-size: 13px; margin-bottom: 12px;">
-                    <span>📍</span> <span id="aiLocationText">Detecting Location...</span>
-                </div>
-
-                <div class="ai-metric-display">
-                    <div class="ai-val-box">
-                        <div class="val" id="aiPredictedVal">--</div>
-                        <div class="label">Predicted AQI</div>
-                    </div>
-                    <div>
-                        <div style="font-weight: 700; color: #e2e8f0; font-size: 16px;" id="aiCategory">PyTorch LSTM Recurrent Network</div>
-                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="aiModelTag">Model: Production PyTorch LSTM (2-Layer)</div>
-                    </div>
-                </div>
-
-                <div class="advisory-box" id="aiAdvisoryText">
-                    Executing PyTorch LSTM time-series inference on 24-hour pollutant and weather sequence...
-                </div>
-                
-                <div id="aiGroupAdvisories" style="margin-top: 10px; font-size: 11px; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px;"></div>
+        <!-- 2. CURRENT WEATHER & POLLUTANTS (ENVIRONMENTAL & METEOROLOGICAL PARAMETERS) -->
+        <div class="glass-card">
+            <div class="section-title">
+                <span>ENVIRONMENTAL & METEOROLOGICAL PARAMETERS</span>
+                <span class="badge-tag tag-live">MULTI-SOURCE FEEDS</span>
             </div>
 
+            <div class="metrics-grid">
+                <div class="metric-tile"><div class="icon">🌡️</div><div class="label">Temperature</div><div class="val" id="mTemp">--</div></div>
+                <div class="metric-tile"><div class="icon">💧</div><div class="label">Humidity</div><div class="val" id="mHum">--</div></div>
+                <div class="metric-tile"><div class="icon">💨</div><div class="label">Wind Speed</div><div class="val" id="mWind">--</div></div>
+                <div class="metric-tile"><div class="icon">⏲️</div><div class="label">Pressure</div><div class="val" id="mPress">--</div></div>
+                <div class="metric-tile"><div class="icon">🌫️</div><div class="label">PM 2.5</div><div class="val" id="mPm25">--</div></div>
+                <div class="metric-tile"><div class="icon">💨</div><div class="label">PM 10</div><div class="val" id="mPm10">--</div></div>
+                <div class="metric-tile"><div class="icon">🧪</div><div class="label">NO₂</div><div class="val" id="mNo2">--</div></div>
+                <div class="metric-tile"><div class="icon">🏭</div><div class="label">SO₂</div><div class="val" id="mSo2">--</div></div>
+                <div class="metric-tile"><div class="icon">🚗</div><div class="label">CO</div><div class="val" id="mCo">--</div></div>
+                <div class="metric-tile"><div class="icon">☀️</div><div class="label">O₃</div><div class="val" id="mO3">--</div></div>
+            </div>
+        </div>
+
+        <!-- 3. AI AQI FORECAST ENGINE (NORMAL INLINE SECTION) -->
+        <div class="glass-card ai-forecast-card">
+            <div class="section-title">
+                <span>AI AQI FORECAST ENGINE</span>
+                <span class="badge-tag tag-ai">AI FORECAST (+24H)</span>
+            </div>
+
+            <div class="location-info" style="color: #c084fc; font-weight: 600; font-size: 13px; margin-bottom: 12px;">
+                <span>📍</span> <span id="aiLocationText">Detecting Location...</span>
+            </div>
+
+            <div class="ai-metric-display">
+                <div class="ai-val-box">
+                    <div class="val" id="aiPredictedVal">--</div>
+                    <div class="label">Predicted AQI</div>
+                </div>
+                <div>
+                    <div style="font-weight: 700; color: #e2e8f0; font-size: 16px;" id="aiCategory">PyTorch LSTM Neural Network</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="aiModelTag">Model: PyTorch LSTM Neural Network</div>
+                </div>
+            </div>
         </div>
 
         <!-- ENVIRONMENTAL METRICS GRID -->
@@ -900,10 +905,10 @@
                     loadEnvironmentForCoordinates(userLat, userLon, false);
                 },
                 (error) => {
-                    let reason = "GPS Access Denied";
-                    if (error.code === 1) reason = "Permission Denied (Code 1)";
-                    else if (error.code === 2) reason = "Position Unavailable (Code 2)";
-                    else if (error.code === 3) reason = "GPS Request Timeout (Code 3)";
+                    let reason = "GPS unavailable — using Delhi NCR default region";
+                    if (error.code === 1) reason = "Location permission denied — using Delhi NCR default region";
+                    else if (error.code === 2) reason = "Position unavailable — using Delhi NCR default region";
+                    else if (error.code === 3) reason = "GPS unavailable — using Delhi NCR default region";
 
                     console.warn(`[GPS Error ${error.code}]: ${error.message}`);
                     loadEnvironmentForCoordinates(userLat, userLon, true, reason);
@@ -926,7 +931,8 @@
                 .then(data => {
                     const statusElem = document.getElementById("navStatus");
                     if (isFallback) {
-                        statusElem.innerHTML = `<span class="status-dot" style="background-color:#f59e0b;box-shadow:0 0 8px #f59e0b;"></span> REGION DEFAULT (Delhi NCR) | LIVE FEEDS ONLINE (${fallbackReason})`;
+                        const reasonTag = fallbackReason ? `<span style="font-size: 11px; opacity: 0.85; margin-left: 6px; font-weight: normal;">(${fallbackReason})</span>` : '';
+                        statusElem.innerHTML = `<span class="status-dot" style="background-color:#10b981;box-shadow:0 0 8px #10b981;"></span> REGION DEFAULT (Delhi NCR) | LIVE FEEDS ONLINE ${reasonTag}`;
                     } else {
                         statusElem.innerHTML = `<span class="status-dot"></span> GPS ACTIVE (${lat.toFixed(4)}, ${lon.toFixed(4)}) | LIVE FEEDS ONLINE`;
                     }
@@ -952,8 +958,9 @@
                     document.getElementById("aiLocationText").innerText = `📍 Location Forecast: ${displayCity}`;
                     document.getElementById("aiPredictedVal").innerText = formatVal(ai.predicted_aqi);
                     document.getElementById("aiCategory").innerText = ai.category || "Inference Complete";
-                    document.getElementById("aiModelTag").innerText = `Model: ${ai.model_used || 'PyTorch LSTM Neural Network'}`;
-                    document.getElementById("aiAdvisoryText").innerText = ai.health_advisory || "Standard health advisory.";
+                    document.getElementById("aiModelTag").innerText = "Model: PyTorch LSTM Neural Network";
+                    const advElem = document.getElementById("aiAdvisoryText");
+                    if (advElem) advElem.remove();
 
                     const grp = ai.group_advisories || {};
                     const grpElem = document.getElementById("aiGroupAdvisories");

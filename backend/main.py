@@ -13,6 +13,15 @@ import math
 import numpy as np
 from datetime import datetime
 from dotenv import load_dotenv
+import concurrent.futures
+
+import sys
+from pathlib import Path
+
+# Ensure backend directory is in sys.path regardless of execution working directory
+_backend_dir = str(Path(__file__).resolve().parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
 
 # Import prediction engine & routing engine
 from prediction_service import prediction_engine
@@ -36,6 +45,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 WAQI_API_KEY = os.getenv("WAQI_API_KEY", "fa08291095089e154037576e5d42012b878c5c04")
@@ -154,7 +164,7 @@ def home():
 def get_aqi_by_geo(latitude: float = Query(...), longitude: float = Query(...)):
     url = f"https://api.waqi.info/feed/geo:{latitude};{longitude}/?token={WAQI_API_KEY}"
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=6)
         data = response.json()
         return parse_waqi_response(data)
     except Exception as e:
@@ -203,7 +213,7 @@ def get_weather(latitude: float = Query(...), longitude: float = Query(...)):
     }
     
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(url, params=params, timeout=6)
         data = response.json()
         current = data.get("current", {})
         
@@ -235,7 +245,7 @@ def reverse_geocode(latitude: float, longitude: float):
     }
 
     try:
-        response = requests.get(url, params=params, headers=headers, timeout=10)
+        response = requests.get(url, params=params, headers=headers, timeout=6)
         data = response.json()
         address = data.get("address", {})
 
@@ -345,14 +355,15 @@ def get_current_environment(latitude: float = Query(...), longitude: float = Que
     """
     Aggregates reverse geocoding, live WAQI AQI, live Open-Meteo weather, and PyTorch LSTM AI forecast.
     """
-    # 1. Reverse Geocode
-    geo = reverse_geocode(latitude, longitude)
-    
-    # 2. Live AQI Feed
-    aqi_res = get_aqi_by_geo(latitude, longitude)
-    
-    # 3. Live Weather Feed
-    weather_res = get_weather(latitude, longitude)
+    # Fetch Reverse Geocode, Live AQI Feed, and Live Weather Feed concurrently
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        f_geo = executor.submit(reverse_geocode, latitude, longitude)
+        f_aqi = executor.submit(get_aqi_by_geo, latitude, longitude)
+        f_weather = executor.submit(get_weather, latitude, longitude)
+        
+        geo = f_geo.result()
+        aqi_res = f_aqi.result()
+        weather_res = f_weather.result()
 
     # Clean numeric parameters for AI model prediction
     curr_aqi = aqi_res.get("aqi") or 110.0
@@ -388,11 +399,44 @@ def get_current_environment(latitude: float = Query(...), longitude: float = Que
         month=now.month
     )
 
+    # 5. Inverse Distance Weighting (IDW) ground station interpolation for exact coordinates
+    spatial_res = spatial_engine.interpolate_aqi(
+        lat=latitude,
+        lon=longitude,
+        power=2.0,
+        k_nearest=5,
+        base_aqi_scale=curr_aqi
+    )
+
+    # 6. Multi-pollutant analysis & atmospheric dispersion condition
+    dispersion = "Favorable (Good Ventilation)" if wind >= 15.0 else ("Moderate Dispersion" if wind >= 7.0 else "Stagnant (Poor Dispersion, Low Wind)")
+    pollutant_ranks = [
+        ("PM2.5", pm25 / 60.0),
+        ("PM10", pm10 / 100.0),
+        ("NO2", no2 / 80.0),
+        ("SO2", so2 / 80.0),
+        ("CO", co / 4.0),
+        ("O3", o3 / 100.0)
+    ]
+    dominant = max(pollutant_ranks, key=lambda x: x[1])[0]
+
+    env_intel = {
+        "dominant_pollutant": dominant,
+        "atmospheric_dispersion": dispersion,
+        "wind_speed_kmh": wind,
+        "surface_pressure_hpa": press,
+        "spatial_interpolated_aqi": spatial_res.get("interpolated_aqi"),
+        "nearest_station": spatial_res.get("nearest_station"),
+        "monitoring_stations_count": len(spatial_res.get("contributing_stations", []))
+    }
+
     return {
         "location": geo,
         "coordinates": {"latitude": latitude, "longitude": longitude},
         "live_aqi": aqi_res,
         "live_weather": weather_res,
+        "environmental_intelligence": env_intel,
+        "spatial_interpolation": spatial_res,
         "ai_prediction": ai_prediction,
         "timestamp": now.strftime("%Y-%m-%d %H:%M:%S")
     }
