@@ -1,306 +1,164 @@
-# AI-Powered Environmental Intelligence System
-## Air Quality Prediction & Smart Mobility Recommendations
+# AI-Powered Environmental Intelligence System (AirSense)
 
-[![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11-blue.svg)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com/)
-[![Deep Learning](https://img.shields.io/badge/PyTorch-2.2+-EE4C2C.svg)](https://pytorch.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Milestone%202-Verified%20100%25-brightgreen.svg)]()
+AirSense is an urban environmental intelligence and exposure-aware mobility recommendation platform engineered for the National Capital Territory (NCT) of Delhi. The system ingests ambient telemetry, computes spatial Inverse Distance Weighting (IDW) interpolation over 38 ground stations, and calculates inhaled pollutant exposure across candidate corridors. By combining time-series forecasting with a sequential multi-agent advisory pipeline, AirSense helps commuters identify cleaner, lower-risk travel routes.
 
 ---
 
-## 1. Project Title
-**AI-Powered Environmental Intelligence System for Air Quality Prediction and Smart Mobility Recommendations**
+## Key Features
+
+* **Interactive Air-Quality Map & Search**: Leaflet map displaying 38 Delhi NCR monitoring stations with EPA color coding, paired with landmark and station autocomplete search (`/geocode/search`).
+* **Spatial AQI Interpolation**: Coordinate-level air quality estimation using Inverse Distance Weighting (IDW) combined with microclimate weather telemetry.
+* **Pollution-Aware Route Comparison**: Evaluates Cleanest, Balanced, and Fastest corridors, quantifying travel duration, average/peak AQI exposure, and estimated inhaled $\text{PM}_{2.5}$ dose ($\mu\text{g}$).
+* **AirGuideBot Assistant**: Grounded chatbot providing commute advice, diurnal temperature inversion jogging windows, and CAQM GRAP stage vehicle regulations.
+* **Three-Agent CrewAI Workflow**: Sequential multi-agent pipeline (Environmental Intelligence, Route & Risk Analysis, and AI Advisory) with a deterministic validation safeguard.
+* **RAG Knowledge Retrieval**: Qdrant vector database indexing authoritative CPCB, WHO, IMD, and MoHFW guidelines via `sentence-transformers/all-MiniLM-L6-v2`.
+* **Evaluation Transparency**: Real-time cosine similarity indicators (Question–Answer, Answer–Context, Retrieved-Context) and `time.perf_counter()` latency metrics in chat cards.
 
 ---
 
-## 2. Project Objective
-To provide urban commuters, municipal authorities, and health-conscious citizens with a real-time, deep-learning-powered air quality forecasting platform and a pollution-aware mobility recommendation engine that quantifies exposure and optimizes travel corridors across the National Capital Territory (NCT) of Delhi.
+## Technology Stack
+
+| Layer | Stack |
+|---|---|
+| **Frontend** | React 19, Vite v8, React Router v7, Leaflet, Recharts |
+| **Backend API** | FastAPI, Uvicorn, Pydantic v2 |
+| **Multi-Agent & LLM** | CrewAI, LiteLLM, Google Gemini (`gemini-3.1-flash-lite`) |
+| **Vector DB & RAG** | Qdrant Client, SentenceTransformers (`all-MiniLM-L6-v2`) |
+| **ML & Geospatial** | PyTorch / Keras LSTM, Scikit-Learn, NumPy, Pandas, Haversine IDW, OpenRouteService / OSRM |
+| **Testing** | Pytest, FastAPI TestClient |
 
 ---
 
-## 3. Project Overview
-Urban centers such as Delhi face acute seasonal and episodic air pollution spikes driven by meteorological inversions, industrial emissions, vehicular traffic, and biomass burning. Conventional routing services optimize exclusively for physical distance or travel time, frequently funneling commuters through severe pollution hotspots. 
+## System Architecture
 
-This system integrates:
-1. **Live Multi-Source Feeds:** Real-time AQI from the World Air Quality Index (WAQI) and meteorological feeds from Open-Meteo.
-2. **PyTorch LSTM Time-Series Forecasting:** A production 2-layer Recurrent Neural Network with a 24-hour historical lookback and 18 environmental/temporal features, forecasting local AQI trends up to 24 hours in advance.
-3. **Inverse Distance Weighting (IDW) Spatial Interpolation:** Continuous geospatial surface estimation using observations from 27 CPCB/DPCC monitoring stations across Delhi.
-4. **Smart Mobility Pollution Analysis:** Real road routing via the Open Source Routing Machine (OSRM), evaluating route geometry alternatives for pollution exposure and estimated inhaled PM2.5 dose.
-5. **Interactive Web Command Center:** A Flask-served interactive dashboard featuring Leaflet.js maps, Chart.js forecasting curves, and multi-route comparison cards.
-
----
-
-## 4. Main Features
-- **Real-Time Environmental Telemetry:** Ingests live PM2.5, PM10, NO2, SO2, CO, O3, temperature, humidity, wind speed, and surface pressure.
-- **Production Deep Neural Forecasting:** Active 2-layer PyTorch LSTM model predicting 1-hour and 24-hour forward AQI horizons.
-- **Preserved MLP Baseline:** Preserves Scikit-Learn MLP baseline model for architectural benchmarking.
-- **Geographic Inverse Distance Weighting (IDW):** Mathematically rigorous spatial interpolation ($p=2.0$) over 27 Delhi ground monitoring stations.
-- **Multi-Route Geometry & Exposure Analysis:** Computes spatial pollution profiles and inhaled dose ($\mu\text{g } PM_{2.5}$) across real road alternatives retrieved from OSRM.
-- **Objective Route Recommendation:** Suggests the lowest-exposure travel corridor based on calculated exposure rather than arbitrary heuristics.
-- **Transparent Traffic Documentation:** Clearly specifies when live traffic data is unavailable from OSRM rather than fabricating congestion figures.
-- **Forward & Reverse Geocoding:** OpenStreetMap Nominatim integration for coordinate and location search.
+```mermaid
+flowchart TD
+    UI["Frontend (React 19 + Vite)"] --> API["FastAPI Backend (app_final.py)"]
+    API --> IDW["Spatial IDW (38 Delhi Stations)"]
+    API --> Routing["Route Sampler & Inhaled Dose Engine"]
+    API --> MultiAgent["CrewAI Pipeline (3 Sequential Agents)"]
+    MultiAgent --> RAG["Qdrant RAG (CPCB/WHO Guidelines)"]
+    MultiAgent --> Val["Deterministic Validation Layer"]
+    API --> Eval["Evaluation Service (Cosine Similarity & Latency)"]
+    Eval --> UI
+```
 
 ---
 
-## 5. System Architecture
+## Project Structure
 
 ```text
-                                  +---------------------------------------+
-                                  |         User / Commuter Input         |
-                                  |      (GPS Coordinates / Address)      |
-                                  +-------------------+-------------------+
-                                                      |
-                                                      v
-                                  +---------------------------------------+
-                                  |        FastAPI Backend Service        |
-                                  |         (http://127.0.0.1:8000)       |
-                                  +---------+-------------------+---------+
-                                            |                   |
-                     +----------------------+                   +---------------------+
-                     |                                                                |
-                     v                                                                v
-   +-----------------------------------+                            +-----------------------------------+
-   |      Live Environmental Feeds     |                            |       OSRM Road Routing Engine    |
-   | - WAQI API (Live AQI & PM2.5)     |                            | - Multi-route alternative polylines
-   | - Open-Meteo (Weather & Wind)     |                            | - Driving distances & durations   |
-   +-----------------+-----------------+                            +-----------------+-----------------+
-                     |                                                                |
-                     v                                                                v
-   +-----------------------------------+                            +-----------------------------------+
-   |   PyTorch LSTM Forecasting Model  |                            |   IDW Spatial Pollution Analysis  |
-   | - 24-hour lookback sequence       |                            | - 27 Delhi CPCB/DPCC stations     |
-   | - 18 environmental features       |                            | - Route polyline sampling         |
-   | - 24-hour dynamic forward curve   |                            | - Inhaled PM2.5 dose calculation  |
-   +-----------------+-----------------+                            +-----------------+-----------------+
-                     |                                                                |
-                     +----------------------+                   +---------------------+
-                                            |                   |
-                                            v                   v
-                                  +---------------------------------------+
-                                  |    Synthesized Route Recommendation   |
-                                  |  (Lowest Exposure / Minimal Inhaled)  |
-                                  +-------------------+-------------------+
-                                                      |
-                                                      v
-                                  +---------------------------------------+
-                                  |        Flask Web Demonstration        |
-                                  |       (Leaflet Maps & Chart.js)       |
-                                  +---------------------------------------+
+├── airsense-frontend/          # React 19 + Vite web interface
+├── backend/                    # FastAPI backend (app_final.py, crew_advisor.py, rag_service.py)
+├── tests/                      # Automated test suite (pytest: evaluation, integration, unit)
+├── dataset/                    # Historical Delhi air quality data & documentation
+├── notebooks/                  # EDA and model training notebooks
+├── flutter_app/                # Preserved Milestone 3 Flutter mobile application
+├── frontend/                   # Preserved Milestone 2 Flask demonstration application
+├── MILESTONE1_REPORT.md        # Preserved Milestone 1 report
+├── MILESTONE2_REPORT.md        # Preserved Milestone 2 report
+└── LICENSE                     # MIT License
 ```
 
 ---
 
-## 6. Technology Stack
-- **Deep Learning & Inference:** PyTorch (v2.2+), NumPy, Pandas, Scikit-Learn, Joblib
-- **Backend Framework:** FastAPI, Uvicorn, Pydantic, Python-Dotenv
-- **Geospatial & Routing:** OSRM Driving API, OpenStreetMap Nominatim, Haversine IDW
-- **Demonstration Frontend:** Flask, Vanilla HTML5/CSS3, JavaScript (ES6+), Leaflet.js, Chart.js
+## Installation and Setup
 
----
-
-## 7. Dataset
-- **Source:** Central Pollution Control Board (CPCB), DPCC, and IMD.
-- **Coverage:** National Capital Territory (NCT) of Delhi across 27 permanent ground monitoring stations.
-- **Records:** 583,340 hourly observations.
-- **Features:** 18 total features (pollutants, weather variables, temporal encodings, and rolling indicators).
-- **Partition:** Chronological 70% train (204,157 sequences), 15% validation (43,739 sequences), 15% test (43,739 sequences).
-- **Documentation:** Full dataset details are documented in [`dataset/README.md`](dataset/README.md).
-
----
-
-## 8. PyTorch LSTM Model
-- **Active Model Artifact:** `backend/models/aqi_lstm_model.pth`
-- **Scaler Artifact:** `backend/models/scaler.pkl` (MinMaxScaler)
-- **Metadata:** `backend/models/model_metadata.json`
-- **Preserved Baseline:** `backend/models/aqi_model.joblib` (Scikit-Learn MLP)
-- **Architecture:**
-  ```text
-  LSTM(input_dim=18, hidden_dim=64, num_layers=2, dropout=0.2, batch_first=True)
-  Linear(in_features=64, out_features=32)
-  ReLU()
-  Linear(in_features=32, out_features=1)
-  ```
-- **Input Tensor Shape:** `[batch_size, 24, 18]`
-- **Evaluation Performance (Test Set):**
-  - **MAE:** 34.42 AQI
-  - **RMSE:** 44.69 AQI
-  - **MSE:** 1997.54
-  - **$R^2$ Score:** 0.7128
-
----
-
-## 9. IDW Spatial Interpolation
-To resolve continuous spatial air quality across unmonitored coordinates in Delhi:
-$$\hat{Z}(x) = \frac{\sum_{i=1}^k w_i Z_i}{\sum_{i=1}^k w_i}, \quad w_i = \frac{1}{d(x, x_i)^p}$$
-- **Power Parameter ($p$):** 2.0 (standard inverse square distance).
-- **Stations:** Real coordinates from 27 Delhi DPCC/CPCB/IMD stations.
-- **Proximity Snap:** Stations within 50 meters snap directly to ground sensor observation.
-- **Boundary Handling:** Robust error validation on invalid or out-of-bounds geographic inputs.
-
----
-
-## 10. Route Pollution Analysis & Inhaled Dose
-For each candidate driving route returned by OSRM:
-1. Route polyline geometry is sampled at regular intervals.
-2. Each coordinate is evaluated via IDW against the monitoring station network.
-3. Inhaled PM2.5 dose is estimated using standard physiological ventilation metrics:
-   $$\text{Inhaled Dose } (\mu\text{g}) = \text{Route PM}_{2.5} \left(\frac{\mu\text{g}}{\text{m}^3}\right) \times \text{Duration (min)} \times \text{Ventilation Rate } \left(0.012\,\frac{\text{m}^3}{\text{min}}\right)$$
-4. Candidate routes are ranked objectively by lowest exposure and estimated dose.
-
----
-
-## 11. FastAPI Endpoints
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/` | `GET` | System health check and model declaration |
-| `/environment/current` | `GET` | Combined live AQI, weather, and PyTorch LSTM AI forecast |
-| `/aqi/historical` | `GET` | 24-hour historical AQI trend |
-| `/prediction/aqi` | `POST` | Dynamic PyTorch LSTM inference and 24-hour hourly forecast |
-| `/route/analyze` | `POST` | OSRM road geometry, IDW route AQI, inhaled dose, and recommendations |
-| `/spatial/interpolate` | `GET` | Standalone IDW coordinate interpolation endpoint |
-| `/geocode` | `GET` | Forward geocoding via OpenStreetMap |
-| `/reverse-geocode` | `GET` | Reverse geocoding for latitude/longitude |
-| `/aqi/{city}` | `GET` | Preserved city-based AQI lookup |
-| `/weather` | `GET` | Preserved Open-Meteo weather endpoint |
-
----
-
-## 12. Flask Dashboard
-The demonstration web application provides a visual command center:
-- Live AQI severity gauge with EPA color coding
-- Real-time meteorological metric tiles
-- 24-hour historical vs AI-predicted AQI curves
-- Interactive Leaflet.js map with route polyline overlays
-- Comparative route alternative cards with exposure ratings and inhaled dose estimates
-
----
-
-## 13. Installation & Setup
-
-### Clone Repository
+### 1. Clone & Switch Branch
 ```bash
-git clone https://github.com/your-username/AI_Environmental_Intelligence.git
-cd AI_Environmental_Intelligence
+git clone https://github.com/Springboard-Internship-2026/AI-Powered-Environmental-Intellig-System-for-Air-Quality-Predic-and-Smart-Mobility-Recomme-AUG-2026.git
+cd AI-Powered-Environmental-Intellig-System-for-Air-Quality-Predic-and-Smart-Mobility-Recomme-AUG-2026
+git checkout abhishek-ainapure
 ```
 
-### Install Dependencies
+### 2. Configure Backend
 ```bash
 pip install -r backend/requirements.txt
-pip install flask
-```
-
-### Configure Environment
-Copy `.env.example` to `.env`:
-```bash
 cp backend/.env.example backend/.env
+# Add GEMINI_API_KEY to backend/.env (free tier: https://aistudio.google.com/)
+python -m uvicorn backend.app_final:app --host 127.0.0.1 --port 8000
 ```
-Add your free WAQI API key from [aqicn.org](https://aqicn.org/data-platform/token/).
+Backend runs at `http://127.0.0.1:8000` (interactive documentation at `/docs`).
 
----
-
-## 14. How to Run
-
-### Start FastAPI Backend
+### 3. Run Frontend
 ```bash
-cd backend
-python -m uvicorn main:app --host 127.0.0.1 --port 8000
+cd airsense-frontend
+npm install
+npm run dev
 ```
-- API Root: `http://127.0.0.1:8000`
-- Interactive Swagger Docs: `http://127.0.0.1:8000/docs`
+Frontend runs at `http://localhost:5173`.
 
-### Start Flask Frontend
-In a new terminal window:
+---
+
+## AI Workflow & Evaluation
+
+1. **Environmental Ingestion**: Telemetry from 38 Delhi ground monitors is spatially interpolated across arbitrary coordinates via IDW.
+2. **Route Exposure Scoring**: Candidate road corridors are sampled to compute distance, duration, average/peak AQI, and estimated inhaled $\text{PM}_{2.5}$ dose.
+3. **CrewAI Advisory**: The *Environmental Intelligence Agent* verifies atmospheric stability, the *Route & Risk Analysis Agent* evaluates speed versus exposure trade-offs, and the *AI Advisory Agent* consults Qdrant RAG knowledge to formulate personalized travel guidance. A *Deterministic Validation Layer* enforces bounds and prevents hallucinated recommendations.
+
+### AirGuideBot Evaluation Indicators
+
+AirGuideBot displays real-time evaluation indicators computed for live responses:
+
+| Metric | Explanation |
+|---|---|
+| **Question–Answer Semantic Similarity** | Cosine similarity between the user's question embedding and the generated answer embedding. Measures semantic similarity, not factual correctness. |
+| **Answer–Context Semantic Similarity** | Cosine similarity between the generated answer and retrieved RAG context. Displays `N/A` when suitable context is unavailable. |
+| **Retrieved-Context Similarity** | The actual retrieval similarity score of the top Qdrant result, when available. |
+| **Generation Latency** | Time taken to generate the response, measured using `time.perf_counter()`. |
+| **End-to-End Latency** | Total processing time for the relevant request, measured separately from generation latency. |
+
+> Semantic similarity indicates embedding-space proximity and does not establish factual correctness. Latency measurements describe execution time, not response quality.
+
+### Formal RAGAS Benchmark Metrics
+
+Formal RAGAS metrics are not evaluated for live responses and are returned as `N/A` by the backend:
+* **Faithfulness**: Requires claim-level natural language inference (NLI) against retrieved context.
+* **Answer Relevancy**: Requires reverse candidate question generation from the answer.
+* **Context Precision**: Requires per-chunk ground-truth relevance annotations.
+* **Context Recall**: Requires gold reference answers unavailable in interactive chat.
+
+These metrics are evaluated separately in the offline benchmark suite (`backend/evaluation_service.py: evaluate_offline_rag_benchmark`) on test datasets with labeled reference ground truth.
+
+---
+
+## Testing
+
 ```bash
-cd frontend
-python app.py
-```
-- Web Dashboard: `http://127.0.0.1:8080`
+# Run backend test suite (21 unit, integration, and evaluation tests)
+pytest
 
----
-
-## 15. Verification Suite
-Execute the single end-to-end verification script:
-```bash
-python backend/verify_milestone2_final.py
-```
-Validates all 30 automated criteria across backend startup, model parity, IDW mathematical correctness, route analysis, frontend integration, and zero regressions.
-
----
-
-## 16. Project Structure
-```text
-AI_Environmental_Intelligence/
-│
-├── backend/
-│   ├── models/
-│   │   ├── aqi_lstm_model.pth          # Active production PyTorch LSTM weights
-│   │   ├── aqi_model.joblib            # Preserved Scikit-Learn MLP baseline
-│   │   ├── delhi_stations.json         # 27 Delhi monitoring station coordinates
-│   │   ├── model_metadata.json         # Training metrics and architecture metadata
-│   │   └── scaler.pkl                  # Fitted MinMaxScaler
-│   │
-│   ├── main.py                         # FastAPI application & route declarations
-│   ├── prediction_service.py           # PyTorch LSTM inference engine
-│   ├── routing_service.py              # OSRM routing & route exposure engine
-│   ├── spatial_interpolation.py        # IDW spatial interpolation engine
-│   ├── health_advisory.py              # Preserved demographic advisory definitions
-│   ├── notification_service.py         # Notification interface definition
-│   ├── train_model.py                  # PyTorch LSTM model training pipeline
-│   ├── verify_milestone2_final.py      # Complete 30-point verification suite
-│   ├── requirements.txt                # Python backend dependencies
-│   ├── .env.example                    # Environment variable template
-│   └── .env                            # Local configuration (gitignored)
-│
-├── frontend/
-│   ├── static/
-│   │   ├── css/style.css               # Dashboard stylesheet
-│   │   └── js/app.js                   # Map, chart, and API interaction logic
-│   ├── templates/
-│   │   └── index.html                  # Flask Jinja2 dashboard template
-│   ├── app.py                          # Flask web server
-│   └── index.html                      # Standalone demonstration dashboard
-│
-├── dataset/
-│   └── README.md                       # Dataset specifications & source documentation
-│
-├── notebooks/
-│   └── 01_eda_and_feature_analysis.ipynb # Milestone 1 exploratory data analysis
-│
-├── MILESTONE1_REPORT.md                # Milestone 1 completion documentation
-├── MILESTONE2_REPORT.md                # Milestone 2 completion documentation
-├── README.md                           # Master project documentation
-├── LICENSE                             # MIT License
-└── .gitignore                          # Git exclusions file
+# Validate frontend production build
+cd airsense-frontend && npm run build
 ```
 
 ---
 
-## 17. Milestone Summary
+## Limitations
 
-### Milestone 1: Data Ingestion & Exploratory Analysis
-- Integrated historical Delhi AQI records across 27 CPCB monitoring stations.
-- Implemented live WAQI AQI feed, Open-Meteo weather integration, and OpenStreetMap geocoding.
-- Generated exploratory data analysis visual distributions, correlation heatmaps, and diurnal trends.
-
-### Milestone 2: Deep Learning Model & Smart Routing
-- Built and trained production 2-layer PyTorch LSTM with 24-hour historical lookback over 18 features.
-- Implemented genuine Inverse Distance Weighting (IDW) spatial interpolation across 27 Delhi ground stations.
-- Integrated OSRM road routing engine with multi-alternative geometry extraction.
-- Developed spatial route pollution scoring and inhaled PM2.5 dose calculation.
-- Connected FastAPI backend with Flask demonstration dashboard and Leaflet.js mapping.
+* **Station Density**: IDW interpolation accuracy depends on sensor distribution; peripheral NCR regions have higher uncertainty than central urban clusters.
+* **Interpolated vs. Point Data**: Estimates between stations represent continuous ambient spatial gradients rather than direct micro-sensor measurements.
+* **External API Fallbacks**: Routing (ORS/OSRM) and weather (Open-Meteo) utilize cached offline fallbacks when external services experience rate limits.
+* **Chat Evaluation Scope**: Live indicators reflect semantic similarity for low-latency responsiveness rather than full formal NLI claim verification.
 
 ---
 
-## 18. Known Limitations
-1. **OSRM Live Traffic:** Public OSRM routing instances do not supply live vehicular congestion feeds. Travel times reflect speed limit physics; route recommendations are driven purely by calculated pollution exposure.
-2. **Station Spatial Density:** IDW accuracy is constrained by the 27 physical ground sensor locations in Delhi-NCR. Peripheral rural regions exhibit higher interpolation uncertainty.
-3. **Sensor Maintenance:** WAQI station observations occasionally report sensor maintenance gaps, for which fallback baseline imputations are maintained.
+## My Role & Contributions
+
+**Role:** AI/ML Developer — Infosys Springboard Internship
+
+* **Multi-Agent AI Integration**: Integrated the three-agent CrewAI advisory workflow (`backend/crew_advisor.py`) to orchestrate environmental intelligence, corridor risk analysis, and personalized health advisories, reinforced with a deterministic validation safeguard.
+* **RAG Knowledge Subsystem**: Implemented the Qdrant vector retrieval engine (`backend/rag_service.py`) using `sentence-transformers/all-MiniLM-L6-v2` to ground advisories and chatbot answers in authoritative CPCB, WHO, and MoHFW guidelines.
+* **Backend API Development**: Developed and consolidated FastAPI services (`backend/app_final.py`) for sequential route advisory (`/route_advisory`), place search autocomplete (`/geocode/search`), and AirGuideBot conversational assistance (`/airguide_chat`).
+* **Frontend Dashboard & UI**: Contributed to the React 19 + Vite single-page application (`airsense-frontend/`), integrating landmark autocomplete, route exposure comparison cards, and the AirGuideBot modal interface.
+* **Testing & Quality Evaluation**: Built the response evaluation service (`backend/evaluation_service.py`) implementing real-time cosine semantic similarity indicators and `time.perf_counter()` latency tracking, alongside authoring automated Pytest test suites (`tests/`).
 
 ---
 
-## 19. Future Work
-- **Flutter Android Application:** Native mobile client connecting directly to the FastAPI backend with on-device GPS tracking and push notifications.
-- **Traffic Provider Integration:** Migration to live congestion-aware routing APIs (e.g. TomTom, Google Maps) to synthesize travel delay with pollution exposure.
-- **Graph Neural Networks (GNN):** Spatio-temporal graph modeling to capture wind advection and cross-station pollutant dispersion dynamics.
+## Internship, Author and License
+
+* **Program**: Infosys Springboard Internship (AI-Powered Environmental Intelligence System for Air Quality Prediction and Smart Mobility Recommendations)
+* **Milestone Continuity**: Preserves Milestone 1 EDA, Milestone 2 model deployment/Flask demonstration, Milestone 3 Flutter app, and foundational datasets alongside AirSense.
+* **Author**: Abhishek Ainapure ([ainapureabhi0821@gmail.com](mailto:ainapureabhi0821@gmail.com))
+* **License**: Licensed under the [MIT License](LICENSE).
+
