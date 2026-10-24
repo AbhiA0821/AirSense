@@ -38,3 +38,18 @@ local.properties
 runtime/
 scratch/
 .pytest_cache/
+
+# React Frontend
+airsense-frontend/node_modules/
+airsense-frontend/dist/
+airsense-frontend/.env
+
+# Vector DB
+qdrant_data/
+backend/qdrant_data/
+
+# Whitelist backend station & test datasets
+!backend/delhi_test.csv
+!backend/station_coords.csv
+!backend/stations.csv
+
