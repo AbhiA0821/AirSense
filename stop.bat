@@ -6,8 +6,8 @@ set "ROOT_DIR=%~dp0"
 cd /d "%ROOT_DIR%"
 
 echo ========================================================
-echo AI-Powered Environmental Intelligence System
-echo Milestone 3 Safe Process Shutdown System
+echo AirSense — AI Environmental Intelligence System
+echo Safe Process Shutdown System
 echo ========================================================
 echo.
 
@@ -31,47 +31,29 @@ if exist "%ROOT_DIR%runtime\fastapi.pid" (
     echo [FastAPI]  No runtime\fastapi.pid found. Skipping.
 )
 
-:: 2. Terminate Flask M2 frontend process by saved PID
-if exist "%ROOT_DIR%runtime\flask.pid" (
-    set /p FLASK_PID=<"%ROOT_DIR%runtime\flask.pid"
-    if defined FLASK_PID (
-        echo [Stopping] Terminating Flask Frontend process [PID: !FLASK_PID!]...
-        taskkill /F /PID !FLASK_PID! /T >nul 2>&1
+:: 2. Terminate React + Vite frontend process by saved PID
+if exist "%ROOT_DIR%runtime\vite.pid" (
+    set /p VITE_PID=<"%ROOT_DIR%runtime\vite.pid"
+    if defined VITE_PID (
+        echo [Stopping] Terminating React Vite Frontend process [PID: !VITE_PID!]...
+        taskkill /F /PID !VITE_PID! /T >nul 2>&1
         if !errorlevel! equ 0 (
-            echo           Flask process stopped successfully.
+            echo           React Vite process stopped successfully.
             set /a STOPPED_COUNT+=1
         ) else (
-            echo           Flask process was already terminated or inactive.
+            echo           React Vite process was already terminated or inactive.
         )
     )
-    del "%ROOT_DIR%runtime\flask.pid" >nul 2>&1
+    del "%ROOT_DIR%runtime\vite.pid" >nul 2>&1
 ) else (
-    echo [Flask]    No runtime\flask.pid found. Skipping.
-)
-
-:: 3. Terminate Flutter Chrome development process by saved PID
-if exist "%ROOT_DIR%runtime\flutter.pid" (
-    set /p FLUTTER_PID=<"%ROOT_DIR%runtime\flutter.pid"
-    if defined FLUTTER_PID (
-        echo [Stopping] Terminating Flutter Development process [PID: !FLUTTER_PID!]...
-        taskkill /F /PID !FLUTTER_PID! /T >nul 2>&1
-        if !errorlevel! equ 0 (
-            echo           Flutter process stopped successfully.
-            set /a STOPPED_COUNT+=1
-        ) else (
-            echo           Flutter process was already terminated or inactive.
-        )
-    )
-    del "%ROOT_DIR%runtime\flutter.pid" >nul 2>&1
-) else (
-    echo [Flutter]  No runtime\flutter.pid found. Skipping.
+    echo [React UI] No runtime\vite.pid found. Skipping.
 )
 
 echo.
 echo ========================================================
 echo SHUTDOWN COMPLETE:
 echo   - Only project-specific tracked processes were terminated.
-echo   - No unrelated python.exe or Chrome processes were affected.
+echo   - No unrelated python.exe or Node processes were affected.
 echo   - Runtime PID files cleaned.
 echo ========================================================
 echo.

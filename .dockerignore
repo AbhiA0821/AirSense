@@ -6,12 +6,10 @@ __pycache__
 *.pyo
 *.pyd
 
-# Frontend applications (deployed separately)
+# Frontend application (deployed separately)
 airsense-frontend/
-flutter_app/
-frontend/
 
-# Raw dataset archives and Jupyter notebooks
+# Raw dataset archives, docs, and Jupyter notebooks
 dataset/
 notebooks/
 docs/

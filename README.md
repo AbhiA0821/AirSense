@@ -50,11 +50,13 @@ flowchart TD
 ```text
 ├── airsense-frontend/          # React 19 + Vite web interface
 ├── backend/                    # FastAPI backend (app_final.py, crew_advisor.py, rag_service.py)
-├── tests/                      # Automated test suite (pytest: evaluation, integration, unit)
 ├── dataset/                    # Historical Delhi air quality data & documentation
+├── docs/                       # Project documentation & architectural assets
 ├── notebooks/                  # EDA and model training notebooks
-├── flutter_app/                # Preserved Milestone 3 Flutter mobile application
-├── frontend/                   # Preserved Milestone 2 Flask demonstration application
+├── tests/                      # Automated test suite (pytest: evaluation, integration, unit)
+├── start.bat                   # Unified startup script (FastAPI + React Vite)
+├── stop.bat                    # Safe process shutdown script
+├── Dockerfile                  # Container build specification (app_final)
 ├── MILESTONE1_REPORT.md        # Preserved Milestone 1 report
 ├── MILESTONE2_REPORT.md        # Preserved Milestone 2 report
 └── LICENSE                     # MIT License
