@@ -1,0 +1,36 @@
+.git
+.gitignore
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Frontend applications (deployed separately)
+airsense-frontend/
+flutter_app/
+frontend/
+
+# Raw dataset archives and Jupyter notebooks
+dataset/
+notebooks/
+docs/
+
+# Testing and development scripts
+tests/
+runtime/
+*.bat
+start.bat
+stop.bat
+
+# Local virtual environments
+.venv/
+venv/
+backend/venv/
+
+# Local cache and sensitive environment files
+backend/.env
+backend/.env.*
+backend/__pycache__/
+backend/qdrant_data/
+qdrant_data/

@@ -146,16 +146,23 @@ class EnvironmentalRAGService:
         self.qdrant_url = os.environ.get("QDRANT_URL")
         self.qdrant_api_key = os.environ.get("QDRANT_API_KEY")
 
-        # Initialize Qdrant Client
+        # Initialize Qdrant Client (supports Qdrant Cloud, local disk, and in-memory)
         if self.qdrant_url:
-            self.client = QdrantClient(url=self.qdrant_url, api_key=self.qdrant_api_key)
-        elif self.storage_path:
-            os.makedirs(self.storage_path, exist_ok=True)
             try:
-                self.client = QdrantClient(path=self.storage_path)
-            except Exception as _lock_err:
-                print(f"Notice: Storage path locked ({_lock_err}), utilizing in-memory vector database.")
+                self.client = QdrantClient(url=self.qdrant_url, api_key=self.qdrant_api_key)
+            except Exception as _cloud_err:
+                print(f"Notice: Qdrant Cloud connection failed ({_cloud_err}), utilizing in-memory vector database.")
                 self.client = QdrantClient(":memory:")
+        elif self.storage_path:
+            if self.storage_path == ":memory:":
+                self.client = QdrantClient(":memory:")
+            else:
+                os.makedirs(self.storage_path, exist_ok=True)
+                try:
+                    self.client = QdrantClient(path=self.storage_path)
+                except Exception as _lock_err:
+                    print(f"Notice: Storage path locked ({_lock_err}), utilizing in-memory vector database.")
+                    self.client = QdrantClient(":memory:")
         else:
             default_path = os.path.join(os.path.dirname(__file__), "qdrant_data")
             os.makedirs(default_path, exist_ok=True)
